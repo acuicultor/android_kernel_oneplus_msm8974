@@ -1013,7 +1013,7 @@ static unsigned int syna_lcd_ratio2;
 
 /***** For virtual key definition begin *******************/
 enum tp_vkey_enum {
-	TP_VKEY_APPSWITCH,
+	TP_VKEY_MENU,
 	TP_VKEY_HOME,
 	TP_VKEY_BACK,
 
@@ -1071,7 +1071,7 @@ static ssize_t vk_syna_show(struct kobject *kobj,
 	struct synaptics_rmi4_data *ts = syna_rmi4_data;
 	int len;
 	len = sprintf(buf,
-		__stringify(EV_KEY) ":" __stringify(KEY_APPSELECT)  ":%d:%d:%d:%d"
+		__stringify(EV_KEY) ":" __stringify(KEY_MENU)  ":%d:%d:%d:%d"
 		":" __stringify(EV_KEY) ":" __stringify(KEY_HOMEPAGE)  ":%d:%d:%d:%d"
 		":" __stringify(EV_KEY) ":" __stringify(KEY_BACK)  ":%d:%d:%d:%d" "\n",
 		VK_LCD_WIDTH/2 + 0,   ts->vk_prop_center_y, ts->vk_prop_width, ts->vk_prop_height,
@@ -1643,11 +1643,11 @@ static int keypad_enable_proc_write(struct file *file, const char __user *buffer
 	atomic_set(&ts->keypad_enable, val);
 	if (val) {
 		set_bit(KEY_BACK, ts->input_dev->keybit);
-		set_bit(KEY_APPSELECT, ts->input_dev->keybit);
+		set_bit(KEY_MENU, ts->input_dev->keybit);
 		set_bit(KEY_HOMEPAGE, ts->input_dev->keybit);
 	} else {
 		clear_bit(KEY_BACK, ts->input_dev->keybit);
-		clear_bit(KEY_APPSELECT, ts->input_dev->keybit);
+		clear_bit(KEY_MENU, ts->input_dev->keybit);
 		clear_bit(KEY_HOMEPAGE, ts->input_dev->keybit);
 	}
 	input_sync(ts->input_dev);
@@ -3853,7 +3853,7 @@ static void synaptics_rmi4_set_params(struct synaptics_rmi4_data *rmi4_data)
 	rmi = &(rmi4_data->rmi4_mod_info);
 
 	set_bit(KEY_BACK, rmi4_data->input_dev->keybit);
-	set_bit(KEY_APPSELECT, rmi4_data->input_dev->keybit);
+	set_bit(KEY_MENU, rmi4_data->input_dev->keybit);
 	set_bit(KEY_HOMEPAGE, rmi4_data->input_dev->keybit);
 	set_bit(KEY_F3, rmi4_data->input_dev->keybit);
 	set_bit(KEY_WAKEUP, rmi4_data->input_dev->keybit);
