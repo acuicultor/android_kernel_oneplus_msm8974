@@ -772,7 +772,6 @@ static struct sock *unix_create1(struct net *net, struct socket *sock)
 	init_waitqueue_head(&u->peer_wait);
 	unix_insert_socket(unix_sockets_unbound(sk), sk);
 	init_waitqueue_func_entry(&u->peer_wake, unix_dgram_peer_wake_relay);
-	unix_insert_socket(unix_sockets_unbound(sk), sk);
 out:
 	if (sk == NULL)
 		atomic_long_dec(&unix_nr_socks);
