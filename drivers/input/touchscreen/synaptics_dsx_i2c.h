@@ -75,7 +75,7 @@
 #define TP_VENDOR_WINTEK	1	//ʤ��
 #define TP_VENDOR_TPK		2	//TPK
 #define TP_VENDOR_TRULY		3	//����
-#define TP_VENDOR_YOUNGFAST 4   //��
+#define TP_VENDOR_YOUNGFAST 4   //����
 
 #define TP_TYPE_MAX		2	//we only use wintek and tpk now.
 
@@ -283,6 +283,7 @@ struct synaptics_rmi4_data {
 	atomic_t double_tap_enable;
 	atomic_t sweep_wake_enable;
 	atomic_t double_swipe_enable;
+	atomic_t up_arrow_enable;
 	atomic_t down_arrow_enable;
 	atomic_t left_arrow_enable;
 	atomic_t right_arrow_enable;
