@@ -4374,7 +4374,7 @@ static void synaptics_rmi4_init_work(struct work_struct *work)
 		synaptics_enable_irqwake(rmi4_data,false);
 		atomic_set(&rmi4_data->syna_use_gesture,
 			atomic_read(&rmi4_data->double_tap_enable) ||
-            atomic_read(&rmi4_data->sweep_wake_enable) ? 1 : 0);
+            atomic_read(&rmi4_data->sweep_wake_enable) ||
 			atomic_read(&rmi4_data->double_swipe_enable) ||
 			atomic_read(&rmi4_data->up_arrow_enable) ||
 			atomic_read(&rmi4_data->down_arrow_enable) ||
@@ -4784,7 +4784,7 @@ static int synaptics_rmi4_suspend(struct device *dev)
 
 	atomic_set(&rmi4_data->syna_use_gesture,
 			atomic_read(&rmi4_data->double_tap_enable) ||
-			atomic_read(&rmi4_data->sweep_wake_enable) ? 1 : 0);
+			atomic_read(&rmi4_data->sweep_wake_enable) ||
 			atomic_read(&rmi4_data->double_swipe_enable) ||
 			atomic_read(&rmi4_data->up_arrow_enable) ||
 			atomic_read(&rmi4_data->down_arrow_enable) ||
