@@ -969,7 +969,6 @@ int try_to_del_timer_sync(struct timer_list *timer)
 	base = lock_timer_base(timer, &flags);
 
 	if (base->running_timer != timer) {
-		timer_stats_timer_clear_start_info(timer);
 		ret = detach_if_pending(timer, base, true);
 	}
 	spin_unlock_irqrestore(&base->lock, flags);
@@ -1784,7 +1783,6 @@ void __init init_timers(void)
 
 	err = timer_cpu_notify(&timers_nb, (unsigned long)CPU_UP_PREPARE,
 			       (void *)(long)smp_processor_id());
-	init_timer_stats();
 
 	BUG_ON(err != NOTIFY_OK);
 
