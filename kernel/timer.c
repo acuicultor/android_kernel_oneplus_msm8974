@@ -379,6 +379,19 @@ __internal_add_timer(struct tvec_base *base, struct timer_list *timer)
 	list_add_tail(&timer->entry, vec);
 }
 
+static void internal_add_timer(struct tvec_base *base, struct timer_list *timer)
+{
+	__internal_add_timer(base, timer);
+	/*
+	 * Update base->active_timers and base->next_timer
+	 */
+	if (!tbase_get_deferrable(timer->base)) {
+		if (time_before(timer->expires, base->next_timer))
+			base->next_timer = timer->expires;
+		base->active_timers++;
+	}
+}
+
 #ifdef CONFIG_DEBUG_OBJECTS_TIMERS
 
 static struct debug_obj_descr timer_debug_descr;
@@ -955,16 +968,8 @@ int try_to_del_timer_sync(struct timer_list *timer)
 
 	base = lock_timer_base(timer, &flags);
 
-	if (base->running_timer == timer)
-		goto out;
-
-	ret = 0;
-	if (timer_pending(timer)) {
-		detach_timer(timer, 1);
-		if (timer->expires == base->next_timer &&
-		    !tbase_get_deferrable(timer->base))
-			base->next_timer = base->timer_jiffies;
-		ret = 1;
+	if (base->running_timer != timer) {
+		ret = detach_if_pending(timer, base, true);
 	}
 	spin_unlock_irqrestore(&base->lock, flags);
 
@@ -1772,6 +1777,12 @@ static struct notifier_block __cpuinitdata timers_nb = {
 void __init init_timers(void)
 {
 	int err;
+
+	/* ensure there are enough low bits for flags in timer->base pointer */
+	BUILD_BUG_ON(__alignof__(struct tvec_base) & TIMER_FLAG_MASK);
+
+	err = timer_cpu_notify(&timers_nb, (unsigned long)CPU_UP_PREPARE,
+			       (void *)(long)smp_processor_id());
 
 	BUG_ON(err != NOTIFY_OK);
 
