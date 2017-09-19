@@ -3351,6 +3351,12 @@ sctp_disposition_t sctp_sf_ootb(const struct sctp_endpoint *ep,
 			return sctp_sf_violation_chunklen(ep, asoc, type, arg,
 						  commands);
 
+		/* Report violation if chunk len overflows */
+		ch_end = ((__u8 *)ch) + WORD_ROUND(ntohs(ch->length));
+		if (ch_end > skb_tail_pointer(skb))
+			return sctp_sf_violation_chunklen(ep, asoc, type, arg,
+						  commands);
+
 		/* Now that we know we at least have a chunk header,
 		 * do things that are type appropriate.
 		 */
@@ -3381,12 +3387,6 @@ sctp_disposition_t sctp_sf_ootb(const struct sctp_endpoint *ep,
 				}
 			}
 		}
-
-		/* Report violation if chunk len overflows */
-		ch_end = ((__u8 *)ch) + WORD_ROUND(ntohs(ch->length));
-		if (ch_end > skb_tail_pointer(skb))
-			return sctp_sf_violation_chunklen(ep, asoc, type, arg,
-						  commands);
 
 		ch = (sctp_chunkhdr_t *) ch_end;
 	} while (ch_end < skb_tail_pointer(skb));
@@ -5299,7 +5299,8 @@ sctp_disposition_t sctp_sf_do_6_3_3_rtx(const struct sctp_endpoint *ep,
 	SCTP_INC_STATS(SCTP_MIB_T3_RTX_EXPIREDS);
 
 	if (asoc->overall_error_count >= asoc->max_retrans) {
-		if (asoc->state == SCTP_STATE_SHUTDOWN_PENDING) {
+		if (asoc->peer.zero_window_announced &&
+		    asoc->state == SCTP_STATE_SHUTDOWN_PENDING) {
 			/*
 			 * We are here likely because the receiver had its rwnd
 			 * closed for a while and we have not been able to

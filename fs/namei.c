@@ -1800,8 +1800,6 @@ static int path_lookupat(int dfd, const char *name,
 		}
 	}
 
-out:
-
 	if (!err) {
 		struct super_block *sb = nd->inode->i_sb;
 		if (sb->s_flags & MS_RDONLY) {
